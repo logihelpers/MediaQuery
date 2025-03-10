@@ -35,9 +35,7 @@ class _MediaQueryControlState extends State<MediaQueryControl> with FletStoreMix
       var contentCtrls =
           widget.children.where((c) => c.name == "content" && c.isVisible);
       
-      var mediaQueryControl = Container(
-        child: contentCtrls.isNotEmpty ? createControl(widget.control, contentCtrls.first.id, widget.control.isDisabled) : null
-      );
+      var mediaQueryControl = createControl(widget.control, contentCtrls.first.id, widget.control.isDisabled);
 
           return constrainedControl(context, mediaQueryControl, widget.parent, widget.control);
     }); 
