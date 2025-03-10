@@ -78,10 +78,6 @@ class MediaQuery(ConstrainedControl):
         color_filter: Optional[ColorFilter] = None,
         ignore_interactions: Optional[bool] = None,
         foreground_decoration: Optional[BoxDecoration] = None,
-        on_click: OptionalControlEventCallable = None,
-        on_tap_down: OptionalEventCallable = None,
-        on_long_press: OptionalControlEventCallable = None,
-        on_hover: OptionalControlEventCallable = None,
         #
         # ConstrainedControl and AdaptiveControl
         #
@@ -173,10 +169,6 @@ class MediaQuery(ConstrainedControl):
         self.theme_mode = theme_mode
         self.color_filter = color_filter
         self.ignore_interactions = ignore_interactions
-        self.on_click = on_click
-        self.on_tap_down = on_tap_down
-        self.on_long_press = on_long_press
-        self.on_hover = on_hover
         self.image = image
         self.foreground_decoration = foreground_decoration
 
@@ -450,42 +442,3 @@ class MediaQuery(ConstrainedControl):
         self.__theme_mode = value
         self._set_enum_attr("themeMode", value, ThemeMode)
 
-    # on_click
-    @property
-    def on_click(self):
-        return self._get_event_handler("click")
-
-    @on_click.setter
-    def on_click(self, handler: OptionalControlEventCallable):
-        self._add_event_handler("click", handler)
-        self._set_attr("onClick", True if handler is not None else None)
-
-    # on_tap_down
-    @property
-    def on_tap_down(self) -> OptionalEventCallable:
-        return self.__on_tap_down.handler
-
-    @on_tap_down.setter
-    def on_tap_down(self, handler: OptionalEventCallable):
-        self.__on_tap_down.handler = handler
-        self._set_attr("onTapDown", True if handler is not None else None)
-
-    # on_long_press
-    @property
-    def on_long_press(self):
-        return self._get_event_handler("long_press")
-
-    @on_long_press.setter
-    def on_long_press(self, handler: OptionalControlEventCallable):
-        self._add_event_handler("long_press", handler)
-        self._set_attr("onLongPress", True if handler is not None else None)
-
-    # on_hover
-    @property
-    def on_hover(self):
-        return self._get_event_handler("hover")
-
-    @on_hover.setter
-    def on_hover(self, handler: OptionalControlEventCallable):
-        self._add_event_handler("hover", handler)
-        self._set_attr("onHover", True if handler is not None else None)
