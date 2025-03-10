@@ -1,5 +1,5 @@
-# mediaquery
-Mediaquery control for Flet
+# mediaquerycontainer
+Mediaquerycontainer control for Flet
 
 Flet version: 0.26.0
 

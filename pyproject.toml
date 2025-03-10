@@ -1,7 +1,7 @@
 [project]
-name = "mediaquery"
+name = "mediaquerycontainer"
 version = "0.1.0"
-description = "Mediaquery control for Flet"
+description = "Mediaquerycontainer control for Flet"
 readme = "README.md"
 requires-python = ">=3.9"
 authors = [
@@ -13,12 +13,12 @@ dependencies = [
 
 [project.urls]
 Homepage = "https://mydomain.dev"
-Documentation = "https://github.com/MyGithubAccount/mediaquery"
-Repository = "https://github.com/MyGithubAccount/mediaquery"
-Issues = "https://github.com/MyGithubAccount/mediaquery/issues"
+Documentation = "https://github.com/MyGithubAccount/mediaquerycontainer"
+Repository = "https://github.com/MyGithubAccount/mediaquerycontainer"
+Issues = "https://github.com/MyGithubAccount/mediaquerycontainer/issues"
 
 [tool.setuptools.package-data]
-"flutter.mediaquery" = ["**/*"]
+"flutter.mediaquerycontainer" = ["**/*"]
 
 [tool.uv]
 dev-dependencies = [

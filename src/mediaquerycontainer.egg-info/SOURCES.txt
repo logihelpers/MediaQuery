@@ -1,0 +1,17 @@
+README.md
+pyproject.toml
+src/flutter/mediaquerycontainer/CHANGELOG.md
+src/flutter/mediaquerycontainer/LICENSE
+src/flutter/mediaquerycontainer/README.md
+src/flutter/mediaquerycontainer/pubspec.lock
+src/flutter/mediaquerycontainer/pubspec.yaml
+src/flutter/mediaquerycontainer/lib/mediaquerycontainer.dart
+src/flutter/mediaquerycontainer/lib/src/create_control.dart
+src/flutter/mediaquerycontainer/lib/src/mediaquerycontainer.dart
+src/mediaquerycontainer/__init__.py
+src/mediaquerycontainer/mediaquerycontainer.py
+src/mediaquerycontainer.egg-info/PKG-INFO
+src/mediaquerycontainer.egg-info/SOURCES.txt
+src/mediaquerycontainer.egg-info/dependency_links.txt
+src/mediaquerycontainer.egg-info/requires.txt
+src/mediaquerycontainer.egg-info/top_level.txt

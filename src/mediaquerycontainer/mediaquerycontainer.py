@@ -43,15 +43,11 @@ from flet.core.types import (
 )
 from flet.utils.deprecated import deprecated_property
 
-class MediaQuery(ConstrainedControl):
-    """
-    Mediaquery Control.
-    """
 
+class MediaQueryContainer(ConstrainedControl, AdaptiveControl):
     def __init__(
         self,
         content: Optional[Control] = None,
-        expand: Union[None, bool, int] = None,
         padding: Optional[PaddingValue] = None,
         margin: Optional[MarginValue] = None,
         alignment: Optional[Alignment] = None,
@@ -78,6 +74,10 @@ class MediaQuery(ConstrainedControl):
         color_filter: Optional[ColorFilter] = None,
         ignore_interactions: Optional[bool] = None,
         foreground_decoration: Optional[BoxDecoration] = None,
+        on_click: OptionalControlEventCallable = None,
+        on_tap_down: OptionalEventCallable["MediaQueryContainerTapEvent"] = None,
+        on_long_press: OptionalControlEventCallable = None,
+        on_hover: OptionalControlEventCallable = None,
         #
         # ConstrainedControl and AdaptiveControl
         #
@@ -89,6 +89,7 @@ class MediaQuery(ConstrainedControl):
         top: OptionalNumber = None,
         right: OptionalNumber = None,
         bottom: OptionalNumber = None,
+        expand: Union[None, bool, int] = None,
         expand_loose: Optional[bool] = None,
         col: Optional[ResponsiveNumber] = None,
         opacity: OptionalNumber = None,
@@ -110,7 +111,7 @@ class MediaQuery(ConstrainedControl):
         data: Any = None,
         rtl: Optional[bool] = None,
         adaptive: Optional[bool] = None,
-        on_size_change: OptionalControlEventCallable = None
+        on_media_query_change: OptionalEventCallable["MediaQueryContainerChangeEvent"] = None
     ):
         ConstrainedControl.__init__(
             self,
@@ -145,8 +146,15 @@ class MediaQuery(ConstrainedControl):
             rtl=rtl,
         )
 
+        AdaptiveControl.__init__(self, adaptive=adaptive)
+
+        self.__on_tap_down = EventHandler(lambda e: MediaQueryContainerTapEvent(e))
+        self._add_event_handler("tap_down", self.__on_tap_down.get_handler())
+
+        self.__on_media_query_change = EventHandler(lambda e: MediaQueryContainerChangeEvent(e))
+        self._add_event_handler("size_change", self.__on_media_query_change.get_handler())
+
         self.content = content
-        self.on_size_change = on_size_change
         self.padding = padding
         self.margin = margin
         self.alignment = alignment
@@ -169,43 +177,52 @@ class MediaQuery(ConstrainedControl):
         self.theme_mode = theme_mode
         self.color_filter = color_filter
         self.ignore_interactions = ignore_interactions
+        self.on_click = on_click
+        self.on_tap_down = on_tap_down
+        self.on_long_press = on_long_press
+        self.on_hover = on_hover
         self.image = image
         self.foreground_decoration = foreground_decoration
+        self.on_media_query_change = on_media_query_change
 
     def _get_control_name(self):
-        return "mediaquery"
+        return "mediaquerycontainer"
 
-    # content
-    @property
-    def content(self) -> Optional[Control]:
-        return self.__content
-
-    @content.setter
-    def content(self, value: Optional[Control]):
-        self.__content = value
-    
-    @property
-    def on_size_change(self):
-        return self._get_event_handler("size_change")
-
-    @on_size_change.setter
-    def on_size_change(self, handler):
-        self._add_event_handler("size_change", handler)
+    def before_update(self):
+        super().before_update()
+        assert (
+            self.__blend_mode is None
+            or self.__gradient is not None
+            or self.bgcolor is not None
+        ), "blend_mode applies to bgcolor or gradient, but no bgcolor or gradient was provided"
+        assert (
+            self.__shape != BoxShape.CIRCLE or self.__border_radius is None
+        ), "border_radius is not supported with shape=BoxShape.CIRCLE"
+        self._set_attr_json("borderRadius", self.__border_radius)
+        self._set_attr_json("border", self.__border)
+        self._set_attr_json("margin", self.__margin)
+        self._set_attr_json("padding", self.__padding)
+        self._set_attr_json("alignment", self.__alignment)
+        self._set_attr_json("gradient", self.__gradient)
+        self._set_attr_json("animate", self.__animate)
+        self._set_attr_json("blur", self.__blur)
+        self._set_attr_json("shadow", self.__shadow if self.__shadow else None)
+        self._set_attr_json("theme", self.__theme)
+        self._set_attr_json("darkTheme", self.__dark_theme)
+        self._set_attr_json("colorFilter", self.__color_filter)
+        self._set_attr_json("image", self.__image)
+        self._set_attr_json("foregroundDecoration", self.__foreground_decoration)
 
     def _get_children(self):
         children = []
-        if self.__content:
+        if self.__content is not None:
             self.__content._set_attr_internal("n", "content")
             children.append(self.__content)
         return children
-    
+
+    # alignment
     @property
     def alignment(self) -> Optional[Alignment]:
-        """:obj:`Alignment`, optional: Align the child control within the container.
-
-        Alignment is an instance of `alignment.Alignment` class object with `x` and `y` properties
-        representing the distance from the center of a rectangle.
-        """
         return self.__alignment
 
     @alignment.setter
@@ -442,3 +459,68 @@ class MediaQuery(ConstrainedControl):
         self.__theme_mode = value
         self._set_enum_attr("themeMode", value, ThemeMode)
 
+    # on_click
+    @property
+    def on_click(self):
+        return self._get_event_handler("click")
+
+    @on_click.setter
+    def on_click(self, handler: OptionalControlEventCallable):
+        self._add_event_handler("click", handler)
+        self._set_attr("onClick", True if handler is not None else None)
+
+    # on_tap_down
+    @property
+    def on_tap_down(self) -> OptionalEventCallable["MediaQueryContainerTapEvent"]:
+        return self.__on_tap_down.handler
+
+    @on_tap_down.setter
+    def on_tap_down(self, handler: OptionalEventCallable["MediaQueryContainerTapEvent"]):
+        self.__on_tap_down.handler = handler
+        self._set_attr("onTapDown", True if handler is not None else None)
+
+    # on_long_press
+    @property
+    def on_long_press(self):
+        return self._get_event_handler("long_press")
+
+    @on_long_press.setter
+    def on_long_press(self, handler: OptionalControlEventCallable):
+        self._add_event_handler("long_press", handler)
+        self._set_attr("onLongPress", True if handler is not None else None)
+
+    # on_hover
+    @property
+    def on_hover(self):
+        return self._get_event_handler("hover")
+
+    @on_hover.setter
+    def on_hover(self, handler: OptionalControlEventCallable):
+        self._add_event_handler("hover", handler)
+        self._set_attr("onHover", True if handler is not None else None)
+    
+    # on_tap_down
+    @property
+    def on_media_query_change(self) -> OptionalEventCallable["MediaQueryContainerChangeEvent"]:
+        return self.__on_media_query_change.handler
+
+    @on_media_query_change.setter
+    def on_media_query_change(self, handler: OptionalEventCallable["MediaQueryContainerChangeEvent"]):
+        self.__on_media_query_change.handler = handler
+        self._set_attr("onMediaQueryChange", True if handler is not None else None)
+
+class MediaQueryContainerTapEvent(ControlEvent):
+    def __init__(self, e: ControlEvent):
+        super().__init__(e.target, e.name, e.data, e.control, e.page)
+        d = json.loads(e.data)
+        self.local_x: float = d.get("lx")
+        self.local_y: float = d.get("ly")
+        self.global_x: float = d.get("gx")
+        self.global_y: float = d.get("gy")
+
+class MediaQueryContainerChangeEvent(ControlEvent):
+    def __init__(self, e: ControlEvent):
+        super().__init__(e.target, e.name, e.data, e.control, e.page)
+        d = json.loads(e.data)
+        self.window_width: float = d.get("width")
+        self.window_height: float = d.get("height")
